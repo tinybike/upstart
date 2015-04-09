@@ -1,7 +1,14 @@
 #!/bin/bash
+
 sudo mkdir -p /var/log/slack-irc
 sudo mkdir -p /var/log/cryptocab
 sudo mkdir -p /var/log/arbiter
-sudo chmod a+w /var/log/slack-irc
-sudo chmod a+w /var/log/cryptocab
-sudo chmod a+w /var/log/arbiter
+
+sudo touch /var/log/slack-irc/slack-irc.log
+sudo touch /var/log/cryptocab/cab.log
+sudo touch /var/log/cryptocab/timer.log
+sudo touch /var/log/arbiter/arbiter.log
+
+sudo chmod -R a+w /var/log/slack-irc
+sudo chmod -R a+w /var/log/cryptocab
+sudo chmod -R a+w /var/log/arbiter
