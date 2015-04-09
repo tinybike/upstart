@@ -1,0 +1,7 @@
+#!/bin/bash
+sudo mkdir -p /var/log/slack-irc
+sudo mkdir -p /var/log/cryptocab
+sudo mkdir -p /var/log/arbiter
+sudo chmod a+w /var/log/slack-irc
+sudo chmod a+w /var/log/cryptocab
+sudo chmod a+w /var/log/arbiter
