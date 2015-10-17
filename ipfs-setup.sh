@@ -23,6 +23,9 @@ fi
 
 # install and symlink to ipfs
 echo -e "Installing go-ipfs from ${BLUE}git@github.com:ipfs/go-ipfs${NC}..."
+if [ -f "${IPFS_BIN}" ]; then
+    sudo rm $IPFS_BIN
+fi
 go get -u github.com/ipfs/go-ipfs/cmd/ipfs
 echo -e "Installed:" $BLUE`which ipfs`$NC
 if [ ! -f "${IPFS_BIN}" ]; then
@@ -57,7 +60,7 @@ EOL
 sudo chmod 644 $IPFS_UPSTART
 
 # update firewall: open port 5001
-echo "Open port 5001..."
+echo "Opening port 5001..."
 sudo iptables -A INPUT -p udp --dport 5001 -j ACCEPT
 sudo iptables -A INPUT -p tcp --dport 5001 -j ACCEPT
 
