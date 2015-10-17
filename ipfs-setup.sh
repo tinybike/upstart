@@ -22,7 +22,7 @@ if [ ! -d "$HOME/go" ]; then
 fi
 
 # install and symlink to ipfs
-echo -e "Installing go-ipfs from ${BLUE}git@github.com:ipfs/go-ipfs${NC}..."
+echo -e "Get go-ipfs: ${BLUE}git@github.com:ipfs/go-ipfs${NC}"
 if [ -f "${IPFS_BIN}" ]; then
     sudo rm $IPFS_BIN
 fi
@@ -55,12 +55,12 @@ env USER=${USER}
 start on runlevel [2345]
 stop on runlevel [016]
 respawn
-exec start-stop-daemon --start --chdir /home/$USER --chuid $USER --exec ${IPFS_BIN} -- daemon >> /var/log/ipfs.log 2>&1
+exec start-stop-daemon --start --chuid $USER --exec ${IPFS_BIN} -- daemon >> ${IPFS_LOG} 2>&1
 EOL
 sudo chmod 644 $IPFS_UPSTART
 
 # update firewall: open port 5001
-echo "Opening port 5001..."
+echo -e "Opening port ${BLUE}5001${NC}..."
 sudo iptables -A INPUT -p udp --dport 5001 -j ACCEPT
 sudo iptables -A INPUT -p tcp --dport 5001 -j ACCEPT
 
