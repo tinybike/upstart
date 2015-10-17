@@ -5,8 +5,16 @@
 set -e
 trap "exit" INT
 
+IPFS_BIN="/usr/local/bin/ipfs"
+IPFS_LOG="/var/log/ipfs.log"
+IPFS_UPSTART="/etc/init/ipfs.conf"
+
+BLUE='\033[0;34m'
+NC='\033[0m'
+
 # set up go directory and GOPATH
 if [ ! -d "$HOME/go" ]; then
+    echo "Setting up ~/go directory and GOPATH env variable..."
     mkdir -p ~/go
     echo "export GOPATH=$HOME/go" >> ~/.bashrc
     echo "export PATH=$PATH:$HOME/go/bin:/usr/local/go/bin" >> ~/.bashrc
@@ -14,30 +22,43 @@ if [ ! -d "$HOME/go" ]; then
 fi
 
 # install and symlink to ipfs
+echo -e "Installing go-ipfs from ${BLUE}git@github.com:ipfs/go-ipfs${NC}..."
 go get -u github.com/ipfs/go-ipfs/cmd/ipfs
-sudo ln -s `which ipfs` /usr/local/bin/ipfs
+echo -e "Installed:" $BLUE`which ipfs`$NC
+if [ ! -f "${IPFS_BIN}" ]; then
+    sudo ln -s `which ipfs` $IPFS_BIN
+fi
+echo -e "Created symlink:" $BLUE`which ipfs`$NC
 
 # set up ipfs log file
-sudo touch /var/log/ipfs.log
-sudo chown $USER:$USER /var/log/ipfs.log
+echo -e "Log file: ${BLUE}${IPFS_LOG}${NC}"
+if [ -f "${IPFS_LOG}" ]; then
+    sudo rm $IPFS_LOG
+fi
+sudo touch $IPFS_LOG
+sudo chown $USER:$USER $IPFS_LOG
 
 # create upstart configuration file
-sudo cat >/etc/init/ipfs.conf <<EOL
+echo -e "Upstart script: ${BLUE}${IPFS_UPSTART}${NC}"
+if [ -f "${IPFS_UPSTART}" ]; then
+    sudo rm $IPFS_UPSTART
+fi
+sudo touch $IPFS_UPSTART
+sudo chmod 666 $IPFS_UPSTART
+cat >$IPFS_UPSTART <<EOL
 #!upstart
 description "ipfs"
-
 env USER=${USER}
-
 start on runlevel [2345]
 stop on runlevel [016]
-
 respawn
-
-exec start-stop-daemon --start --chdir /home/$USER --chuid $USER --exec /usr/local/bin/ipfs -- daemon >> /var/log/ipfs.log 2>&1
+exec start-stop-daemon --start --chdir /home/$USER --chuid $USER --exec ${IPFS_BIN} -- daemon >> /var/log/ipfs.log 2>&1
 EOL
+sudo chmod 644 $IPFS_UPSTART
 
 # update iptables to open port 5001
-sudo iptables-restore < <<EOL
+echo -e "Opening port 5001 in firewall..."
+sudo iptables-restore <<EOL
 *filter
 -A INPUT -i lo -j ACCEPT
 -A INPUT -d 127.0.0.0/8 -j REJECT
@@ -63,5 +84,7 @@ COMMIT
 EOL
 
 # start ipfs
+if [ `pidof ipfs` <> 0 ]; then
+    sudo service ipfs stop
+fi
 sudo service ipfs start
-echo "IPFS daemon running:" `pidof ipfs`
