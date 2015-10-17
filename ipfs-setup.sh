@@ -65,7 +65,5 @@ sudo iptables -A INPUT -p udp --dport 5001 -j ACCEPT
 sudo iptables -A INPUT -p tcp --dport 5001 -j ACCEPT
 
 # start ipfs
-if [ `pidof ipfs` <> 0 ]; then
-    sudo service ipfs stop
-fi
+sudo service ipfs status | grep start >> /dev/null && sudo service ipfs stop
 sudo service ipfs start
