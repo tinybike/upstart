@@ -61,8 +61,14 @@ sudo chmod 644 $IPFS_UPSTART
 
 # update firewall: open port 5001
 echo -e "Opening port ${BLUE}5001${NC}..."
-sudo iptables -A INPUT -p udp --dport 5001 -j ACCEPT
-sudo iptables -A INPUT -p tcp --dport 5001 -j ACCEPT
+UDP="INPUT -p udp --dport 5001 -j ACCEPT"
+TCP="INPUT -p tcp --dport 5001 -j ACCEPT"
+set +e
+sudo iptables -D $UDP >> /dev/null 2>&1
+sudo iptables -D $TCP >> /dev/null 2>&1
+set -e
+sudo iptables -A $UDP
+sudo iptables -A $TCP
 
 # start ipfs
 sudo service ipfs status | grep start >> /dev/null && sudo service ipfs stop
