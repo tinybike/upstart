@@ -20,6 +20,8 @@ if [ ! -d "$HOME/go" ]; then
     echo "export PATH=$PATH:$HOME/go/bin:/usr/local/go/bin" >> ~/.bashrc
     source ~/.bashrc
 fi
+export GOPATH=$HOME/go
+export PATH=$PATH:$HOME/go/bin:/usr/local/go/bin
 
 # install and symlink to ipfs
 echo -e "Get go-ipfs: ${BLUE}git@github.com:ipfs/go-ipfs${NC}"
